@@ -6,6 +6,8 @@ import { SOUL, TOOL_SET, ToolType } from './agent';
 import fs from 'fs';
 import { execSync } from 'node:child_process';
 import { ContentBlock, MessageParam, TextBlock, ToolResultBlockParam, ToolUseBlock } from '@anthropic-ai/sdk/resources';
+import { checkCmdSafety, saveApproval } from './approvals';
+import { userInput } from './utils/user-input';
 
 const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY;
 const BOT_TOKEN = process.env.BOT_TOKEN;
@@ -50,6 +52,22 @@ const executeTool = async (name: ToolType, input: { [key: string]: string }): Pr
     case ToolType.WORKING_DIR:
       return process.cwd();
     case ToolType.RUN_COMMAND:
+      const cmd = input['command'];
+      const safety = checkCmdSafety(cmd);
+
+      if (safety === 'needs_approval') {
+        console.log(`Blocked CMD ${cmd} (needs approval)`);
+
+        const answer = await userInput(`Approve the usage of '${cmd}'? [y/n]`);
+
+        if (!['y', 'Y', 'yes', 'Yes', 'YES'].includes(answer)) {
+          saveApproval(cmd, false);
+          return 'Denied. Command needs user approval';
+        }
+
+        saveApproval(cmd, true);
+      }
+
       return ENABLE_EXEC ? execSync(input['command'], { encoding: 'utf-8' }) : 'Execution successful';
     case ToolType.READ_FILE:
       return fs.readFileSync(input['path'], 'utf-8');
