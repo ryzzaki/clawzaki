@@ -15,8 +15,8 @@ All code was written by a human.
 - [x] Persistent sessions
 - [x] Tool calling
 - [x] Permission/Approval mechanism
-- [] Gateway implementation
-- [] Compaction / Context pruning
-- [] Long-term memory
-- [] Heartbeat
-- [] Multi-agents
+- [ ] Gateway implementation
+- [ ] Compaction / Context pruning
+- [ ] Long-term memory
+- [ ] Heartbeat
+- [ ] Multi-agents
