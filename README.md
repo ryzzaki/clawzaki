@@ -9,3 +9,14 @@ All code was written by a human.
 #### Tool Call Example
 
 > Create a file "hello.py" into a folder called "sessions" which will print "Hello World from <your name>" and include your name there. Make sure you create the file in the path of the current workspace where the sessions folder already is.
+
+#### Checklist
+
+- [x] Persistent sessions
+- [x] Tool calling
+- [x] Permission/Approval mechanism
+- [] Gateway implementation
+- [] Compaction / Context pruning
+- [] Long-term memory
+- [] Heartbeat
+- [] Multi-agents
