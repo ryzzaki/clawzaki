@@ -55,6 +55,10 @@ const executeTool = async (name: ToolType, input: { [key: string]: string }): Pr
       const cmd = input['command'];
       const safety = checkCmdSafety(cmd);
 
+      if (safety === 'denied') {
+        return 'User denied command usage. Find alternative.';
+      }
+
       if (safety === 'needs_approval') {
         console.log(`Blocked CMD ${cmd} (needs approval)`);
 
@@ -62,7 +66,7 @@ const executeTool = async (name: ToolType, input: { [key: string]: string }): Pr
 
         if (!['y', 'Y', 'yes', 'Yes', 'YES'].includes(answer)) {
           saveApproval(cmd, false);
-          return 'Denied. Command needs user approval';
+          return 'User denied command usage. Find alternative.';
         }
 
         saveApproval(cmd, true);

@@ -40,5 +40,7 @@ export const checkCmdSafety = (command: string): 'safe' | 'approved' | 'needs_ap
   }
   // completely ban the dangerous patterns - can be reverted to just 'needs_approval'
   const isDangerous = DANGEROUS_PATTERNS.some((pattern) => pattern.test(baseCmd));
-  return isDangerous ? 'denied' : 'needs_approval';
+  const previouslyDenied = approvals.denied.includes(baseCmd);
+
+  return isDangerous || previouslyDenied ? 'denied' : 'needs_approval';
 };
