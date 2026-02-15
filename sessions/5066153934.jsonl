@@ -1,0 +1,6 @@
+{"role":"user","content":"hey my name is jonas"}
+{"role":"assistant","content":"Hey Jonas! Nice to meet you. How's it going? What can I help you with today?"}
+{"role":"user","content":"whats my name"}
+{"role":"assistant","content":"Your name is Jonas! You told me that at the start of our conversation."}
+{"role":"user","content":"and who are you"}
+{"role":"assistant","content":"I'm Jarvis, your personal AI assistant. I'm here to help you with whatever you need — whether that's answering questions, thinking through problems, working on projects, or just having a conversation."}
