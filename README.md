@@ -1,5 +1,11 @@
+### OpenClaw Re-implementation
+
+This is a bare-bones re-implementation of OpenClaw in pure TypeScript. Written with the intent to gain a better grasp of the mental model required to understand how it works under the hood. Feel free to fork & modify.
+
+All code was written by a human.
+
+🫡 to [@dabit3](https://github.com/dabit3) for writing the comprehensive article.
+
 #### Tool Call Example
 
-```
-Create a file "hello.py" into a folder called "sessions" which will print "Hello World from <your name>" and include your name there. Make sure you create the file in the path of the current workspace where the sessions folder already is.
-```
+> Create a file "hello.py" into a folder called "sessions" which will print "Hello World from <your name>" and include your name there. Make sure you create the file in the path of the current workspace where the sessions folder already is.

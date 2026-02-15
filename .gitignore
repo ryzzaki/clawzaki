@@ -1,4 +1,14 @@
-.DS_Store
+# generated
 node_modules
-.env*
+dist
+
+# app specifics
 sessions/*.jsonl
+exec-approvals.json
+
+# env
+.env*
+!.env.example
+
+# misc
+.DS_Store

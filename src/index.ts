@@ -1,5 +1,5 @@
 import 'dotenv/config';
-import { bot, handleMessage } from './bot';
+import { bot, handleMessage } from './agent';
 
 const main = async () => {
   handleMessage();
