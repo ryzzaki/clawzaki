@@ -1,51 +1,12 @@
-import { Anthropic } from '@anthropic-ai/sdk';
-import { Bot } from 'grammy';
-import assert from 'node:assert';
-import { loadSessions, saveSession } from './session';
 import { SOUL, TOOL_SET, ToolType } from './tool-kit';
 import fs from 'fs';
 import { execSync } from 'node:child_process';
 import { ContentBlock, MessageParam, TextBlock, ToolResultBlockParam, ToolUseBlock } from '@anthropic-ai/sdk/resources';
 import { checkCmdSafety, saveApproval } from './approvals';
 import { userInput } from './utils/user-input';
+import { client, LLM_MODEL } from './llm';
 
-const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY;
-const BOT_TOKEN = process.env.BOT_TOKEN;
 const ENABLE_EXEC = process.env.ENABLE_EXEC === '1';
-
-assert(ANTHROPIC_API_KEY);
-assert(BOT_TOKEN);
-
-const LLM_MODEL = 'claude-haiku-4-5';
-
-const client = new Anthropic({
-  apiKey: ANTHROPIC_API_KEY, // This is the default and can be omitted
-});
-
-const bot = new Bot(BOT_TOKEN);
-
-const handleMessage = async () => {
-  bot.on('message', async (ctx) => {
-    const userText = ctx.message.text;
-
-    if (!userText) {
-      return;
-    }
-
-    const author = await ctx.getAuthor();
-    const userId = String(author.user.id);
-
-    const sessionMessages = loadSessions(userId);
-    const userMessage = { role: 'user' as const, content: userText };
-    // push it so that the bot has retained history of this
-    sessionMessages.push(userMessage);
-
-    const { text, messages } = await runAgentLoop(sessionMessages);
-    // save the entire session
-    saveSession(userId, messages);
-    await ctx.reply(text);
-  });
-};
 
 const executeTool = async (name: ToolType, input: { [key: string]: string }): Promise<string> => {
   switch (name) {
@@ -86,7 +47,7 @@ const executeTool = async (name: ToolType, input: { [key: string]: string }): Pr
   }
 };
 
-const runAgentLoop = async (messages: MessageParam[]) => {
+export const runAgentLoop = async (messages: MessageParam[]) => {
   while (true) {
     const response = await client.messages.create({
       max_tokens: 1024,
@@ -154,5 +115,3 @@ const serializeContent = (content: ContentBlock[]) => {
 
   return serialized;
 };
-
-export { bot, handleMessage };
