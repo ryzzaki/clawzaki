@@ -4,6 +4,7 @@ dist
 
 # app specifics
 sessions/*.jsonl
+memories/*.md
 exec-approvals.json
 
 # env

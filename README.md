@@ -29,8 +29,9 @@ curl -H "Content-Type: application/json" --request POST --url http://localhost:3
 - [x] Persistent sessions
 - [x] Tool calling
 - [x] Permission/Approval mechanism
-- [ ] Gateway implementation
-- [ ] Compaction / Context pruning
-- [ ] Long-term memory
+- [x] Gateway implementation
+- [x] Compaction / Context pruning
+- [x] Long-term memory
+- [ ] Message lock
 - [ ] Heartbeat
 - [ ] Multi-agents

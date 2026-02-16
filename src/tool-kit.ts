@@ -18,8 +18,10 @@ export const SOUL = `
 - You're not the user's voice - be careful about sending messages on their behalf
 
 ## Memory
-Remember important details from conversations.
-Write them down if they matter.
+You have a long-term memory system.
+- Use save_memory to store important information (user preferences, key facts, project details).
+- Use memory_search at the start of conversations to recall context from previous sessions.
+Memory files are stored in ./memories/ as markdown files.
 `;
 
 export enum ToolType {
@@ -28,9 +30,45 @@ export enum ToolType {
   READ_FILE = 'read_file',
   WRITE_FILE = 'write_file',
   WEB_SEARCH = 'web_search',
+  SAVE_MEMORY = 'save_memory',
+  SEARCH_MEMORY = 'search_memory',
 }
 
 export const TOOL_SET: ToolUnion[] = [
+  {
+    name: ToolType.SAVE_MEMORY,
+    description:
+      'Save important decisions to memory. Save user preferences, key facts, and anything that is worth saving to be persistent across sessions.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        key: {
+          type: 'string',
+          description: "Short labels such as 'user-preferences' or 'project-notes'",
+        },
+        content: {
+          type: 'string',
+          description: 'The information to be remembered',
+        },
+      },
+      required: ['key', 'content'],
+    },
+  },
+  {
+    name: ToolType.SEARCH_MEMORY,
+    description:
+      'Search the persistent long-term memory for context retrieval. Use at the start of every conversation session to recall memories.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        query: {
+          type: 'string',
+          description: 'Phrase or query to search for',
+        },
+      },
+      required: ['query'],
+    },
+  },
   {
     name: ToolType.WORKING_DIR,
     description: 'Prints the current working directory',

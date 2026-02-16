@@ -3,6 +3,7 @@ import { FastifyReply, FastifyRequest } from 'fastify';
 import { Bot } from 'grammy';
 import { runAgentLoop } from './agent';
 import { loadSessions, saveSession } from './session';
+import { compactSession } from './compaction';
 
 const BOT_TOKEN = process.env.BOT_TOKEN;
 assert(BOT_TOKEN);
@@ -11,7 +12,8 @@ const bot = new Bot(BOT_TOKEN);
 
 const handleServerReq = async (req: FastifyRequest, rep: FastifyReply) => {
   const { userId, message } = req.body as { userId: string; message: string };
-  const sessionMessages = loadSessions(userId);
+  let sessionMessages = loadSessions(userId);
+  sessionMessages = await compactSession(userId, sessionMessages);
   sessionMessages.push({ role: 'user', content: message });
 
   const { text, messages } = await runAgentLoop(sessionMessages);
@@ -31,7 +33,8 @@ const handleMessage = async () => {
     const author = await ctx.getAuthor();
     const userId = String(author.user.id);
 
-    const sessionMessages = loadSessions(userId);
+    let sessionMessages = loadSessions(userId);
+    sessionMessages = await compactSession(userId, sessionMessages);
     const userMessage = { role: 'user' as const, content: userText };
     // push it so that the bot has retained history of this
     sessionMessages.push(userMessage);

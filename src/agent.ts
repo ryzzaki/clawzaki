@@ -2,14 +2,20 @@ import { SOUL, TOOL_SET, ToolType } from './tool-kit';
 import fs from 'fs';
 import { execSync } from 'node:child_process';
 import { ContentBlock, MessageParam, TextBlock, ToolResultBlockParam, ToolUseBlock } from '@anthropic-ai/sdk/resources';
-import { checkCmdSafety, saveApproval } from './approvals';
+import { checkCmdSafety, saveApproval } from './approval';
 import { userInput } from './utils/user-input';
 import { client, LLM_MODEL } from './llm';
+import { saveMemory, searchMemory } from './memory';
 
 const ENABLE_EXEC = process.env.ENABLE_EXEC === '1';
 
 const executeTool = async (name: ToolType, input: { [key: string]: string }): Promise<string> => {
   switch (name) {
+    case ToolType.SAVE_MEMORY:
+      saveMemory(input['key'], input['content']);
+      return 'Memory saved successfully';
+    case ToolType.SEARCH_MEMORY:
+      return searchMemory(input['query']);
     case ToolType.WORKING_DIR:
       return process.cwd();
     case ToolType.RUN_COMMAND:
