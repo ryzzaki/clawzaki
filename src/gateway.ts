@@ -4,6 +4,7 @@ import { Bot } from 'grammy';
 import { runAgentLoop } from './agent';
 import { loadSessions, saveSession } from './session';
 import { compactSession } from './compaction';
+import { getLock } from './session-lock';
 
 const BOT_TOKEN = process.env.BOT_TOKEN;
 assert(BOT_TOKEN);
@@ -12,12 +13,16 @@ const bot = new Bot(BOT_TOKEN);
 
 const handleServerReq = async (req: FastifyRequest, rep: FastifyReply) => {
   const { userId, message } = req.body as { userId: string; message: string };
-  let sessionMessages = loadSessions(userId);
-  sessionMessages = await compactSession(userId, sessionMessages);
-  sessionMessages.push({ role: 'user', content: message });
 
-  const { text, messages } = await runAgentLoop(sessionMessages);
-  saveSession(userId, messages);
+  const text = await getLock(userId).acquire(async () => {
+    let sessionMessages = loadSessions(userId);
+    sessionMessages = await compactSession(userId, sessionMessages);
+    sessionMessages.push({ role: 'user', content: message });
+
+    const { text, messages } = await runAgentLoop(sessionMessages);
+    saveSession(userId, messages);
+    return text;
+  });
 
   return rep.send({ response: text });
 };
@@ -33,15 +38,19 @@ const handleMessage = async () => {
     const author = await ctx.getAuthor();
     const userId = String(author.user.id);
 
-    let sessionMessages = loadSessions(userId);
-    sessionMessages = await compactSession(userId, sessionMessages);
-    const userMessage = { role: 'user' as const, content: userText };
-    // push it so that the bot has retained history of this
-    sessionMessages.push(userMessage);
+    const text = await getLock(userId).acquire(async () => {
+      let sessionMessages = loadSessions(userId);
+      sessionMessages = await compactSession(userId, sessionMessages);
+      const userMessage = { role: 'user' as const, content: userText };
+      // push it so that the bot has retained history of this
+      sessionMessages.push(userMessage);
 
-    const { text, messages } = await runAgentLoop(sessionMessages);
-    // save the entire session
-    saveSession(userId, messages);
+      const { text, messages } = await runAgentLoop(sessionMessages);
+      // save the entire session
+      saveSession(userId, messages);
+      return text;
+    });
+
     await ctx.reply(text);
   });
 };
