@@ -32,6 +32,6 @@ curl -H "Content-Type: application/json" --request POST --url http://localhost:3
 - [x] Gateway implementation
 - [x] Compaction / Context pruning
 - [x] Long-term memory
-- [ ] Message lock
-- [ ] Heartbeat
-- [ ] Multi-agents
+- [x] Message lock
+- [x] Heartbeat
+- [x] Multi-agents

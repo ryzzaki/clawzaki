@@ -1,6 +1,7 @@
 import 'dotenv/config';
 import { bot, handleMessage, handleServerReq } from './gateway';
 import Fastify from 'fastify';
+import { startHeartbeat } from './heartbeat';
 
 const main = async () => {
   const fastify = Fastify({
@@ -10,7 +11,8 @@ const main = async () => {
   fastify.post('/chat', handleServerReq);
   // bind tg bot handler
   handleMessage();
-  // start tg bot and server
+  // start heartbeat, tg bot, and server
+  startHeartbeat();
   bot.start();
   fastify.listen({ port: 3000 }, (err, address) => {
     if (err) {

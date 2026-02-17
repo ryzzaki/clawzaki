@@ -1,4 +1,4 @@
-import { SOUL, TOOL_SET, ToolType } from './tool-kit';
+import { MAIN_SOUL, RESEARCHER_SOUL, TOOL_SET, ToolType } from './toolkit';
 import fs from 'fs';
 import { execSync } from 'node:child_process';
 import { ContentBlock, MessageParam, TextBlock, ToolResultBlockParam, ToolUseBlock } from '@anthropic-ai/sdk/resources';
@@ -8,6 +8,33 @@ import { client, LLM_MODEL } from './llm';
 import { saveMemory, searchMemory } from './memory';
 
 const ENABLE_EXEC = process.env.ENABLE_EXEC === '1';
+
+export const AGENTS = {
+  main: {
+    name: 'Jarvis',
+    soul: MAIN_SOUL,
+    sessionPrefix: 'agent:main',
+  },
+  researcher: {
+    name: 'Friday',
+    soul: RESEARCHER_SOUL,
+    sessionPrefix: 'agent:researcher',
+  },
+};
+
+export const resolveAgent = (message: string) => {
+  if (message.startsWith('/')) {
+    return {
+      agent: 'researcher' as const,
+      text: message.slice('/research '.length),
+    };
+  }
+
+  return {
+    agent: 'main' as const,
+    text: message,
+  };
+};
 
 const executeTool = async (name: ToolType, input: { [key: string]: string }): Promise<string> => {
   switch (name) {
@@ -59,7 +86,7 @@ export const runAgentLoop = async (messages: MessageParam[]) => {
       max_tokens: 1024,
       messages,
       // the soul is inject here as the system prompt
-      system: SOUL,
+      system: MAIN_SOUL,
       model: LLM_MODEL,
       tools: TOOL_SET,
     });
